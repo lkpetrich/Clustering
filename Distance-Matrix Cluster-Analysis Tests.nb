@@ -1,0 +1,804 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     29647,        796]
+NotebookOptionsPosition[     22577,        702]
+NotebookOutlinePosition[     22969,        718]
+CellTagsIndexPosition[     22926,        715]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["\<\
+Distance-Matrix Cluster-Analysis Tests
+
+Uses notebook Distance-Matrix Cluster Analysis\
+\>", "Text",ExpressionUUID->"807f508c-13fc-499c-9554-04f21c2c214f"],
+
+Cell[BoxData[
+ RowBox[{"NotebookEvaluate", "[", 
+  RowBox[{
+   RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+   "\"\<Distance-Matrix Cluster Analysis.nb\>\""}], "]"}]], "Input",
+ CellLabel->"In[2]:=",ExpressionUUID->"e8ab3e2a-066e-421d-8fe2-3dfd20232acc"],
+
+Cell[CellGroupData[{
+
+Cell["Setup", "Subsection",ExpressionUUID->"3b08746c-5da1-4884-8431-292ca98731ef"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Subsets", " ", "for", " ", "testing", " ", "small", " ", 
+   RowBox[{"DM", "'"}], 
+   RowBox[{"s", ":", " ", 
+    RowBox[{
+    "the", " ", "DM", " ", "and", " ", "which", " ", "indices", " ", "to", 
+     " ", "use"}]}]}], " ", "*)"}]], "Input",
+ CellLabel->"In[3]:=",ExpressionUUID->"8bbda1ef-2b83-43c2-88d6-3e0b224b0aff"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dmsub", "[", 
+   RowBox[{"dmat_", ",", "ixs_"}], "]"}], " ", ":=", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"#", "[", 
+      RowBox[{"[", "ixs", "]"}], "]"}], ")"}], "&"}], " ", "/@", " ", 
+   RowBox[{"(", 
+    RowBox[{"dmat", "[", 
+     RowBox[{"[", "ixs", "]"}], "]"}], ")"}]}]}]], "Input",
+ CellLabel->"In[4]:=",ExpressionUUID->"5eab6b92-c2bb-4ab4-8859-fb7c5aed71ff"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"For", " ", "graphing", " ", "named", " ", 
+   RowBox[{"points", ":", " ", 
+    RowBox[{"(", 
+     RowBox[{"name", ",", " ", "point"}], ")"}]}]}], " ", "*)"}]], "Input",
+ CellLabel->"In[5]:=",ExpressionUUID->"728ca50e-e6c7-4de8-87da-52703b71a473"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"graf2d", "[", "nmpts_", "]"}], " ", ":=", " ", 
+  RowBox[{"Graphics", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"Point", "[", 
+        RowBox[{"#", "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "]"}], ",", 
+       RowBox[{"Text", "[", 
+        RowBox[{
+         RowBox[{"#", "[", 
+          RowBox[{"[", "1", "]"}], "]"}], ",", 
+         RowBox[{"#", "[", 
+          RowBox[{"[", "2", "]"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"0", ",", 
+           RowBox[{"-", "1"}]}], "}"}]}], "]"}]}], "}"}], "&"}], " ", "/@", 
+    " ", "nmpts"}], "]"}]}]], "Input",
+ CellLabel->"In[6]:=",ExpressionUUID->"3a5fe163-0ac8-41b0-a8d0-62057ee52bd4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"graf3d", "[", "nmpts_", "]"}], " ", ":=", " ", 
+  RowBox[{"Graphics3D", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"Point", "[", 
+         RowBox[{"#", "[", 
+          RowBox[{"[", "2", "]"}], "]"}], "]"}], ",", 
+        RowBox[{"Text", "[", 
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"#", "[", 
+           RowBox[{"[", "2", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", 
+            RowBox[{"-", "1"}]}], "}"}]}], "]"}]}], "}"}], "&"}], " ", "/@", 
+     "nmpts"}], ",", 
+    RowBox[{"SphericalRegion", "\[Rule]", "True"}]}], "]"}]}]], "Input",
+ CellLabel->"In[7]:=",ExpressionUUID->"10d2d748-f15d-4d90-a247-690c8f6f3b31"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Adding", " ", "numbers", " ", "to", " ", "data", " ", "values"}], 
+  " ", "*)"}]], "Input",
+ CellLabel->"In[8]:=",ExpressionUUID->"d9947208-6251-42cc-a825-6ac2afcaf1dc"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"mknums", "[", "xlst_", "]"}], " ", ":=", " ", 
+  RowBox[{"Transpose", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Range", "[", 
+      RowBox[{"Length", "[", "xlst", "]"}], "]"}], ",", "xlst"}], "}"}], 
+   "]"}]}]], "Input",
+ CellLabel->"In[9]:=",ExpressionUUID->"b3aa3e6c-7808-44dc-bf08-a50c23a070d5"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+  "Tally", " ", "and", " ", "reverse", " ", "sort", " ", "by", " ", "count"}],
+   " ", "*)"}]], "Input",
+ CellLabel->
+  "In[244]:=",ExpressionUUID->"e5804e01-60eb-4a24-8b88-f14d70a52c6e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"tlsort", "[", "xlst_", "]"}], " ", ":=", " ", 
+  RowBox[{"SortBy", "[", 
+   RowBox[{
+    RowBox[{"Tally", "[", "xlst", "]"}], ",", 
+    RowBox[{
+     RowBox[{"-", 
+      RowBox[{"Last", "[", "#", "]"}]}], "&"}]}], "]"}]}]], "Input",
+ CellLabel->"In[17]:=",ExpressionUUID->"4eb3b164-9565-4fbe-90fe-2fd96874ebfa"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Distance-Matrix Fitting", "Section",ExpressionUUID->"f1f95fc9-cf63-46c1-a2d8-07a4d35cb2d9"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dsmt", " ", "=", " ", 
+   RowBox[{"DMExamples", "[", "\"\<WikiDM\>\"", "]"}]}], ";"}]], "Input",
+ CellLabel->"In[10]:=",ExpressionUUID->"0ffbee5f-962f-4527-9d52-b3836cf1548c"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Distance", "-", 
+   RowBox[{"matrix", " ", "fitting"}]}], " ", "*)"}]], "Input",
+ CellLabel->"In[11]:=",ExpressionUUID->"b6452a21-e92a-4797-9466-5a395d01c570"],
+
+Cell[BoxData[
+ RowBox[{"graf2d", "[", 
+  RowBox[{"mknums", "[", 
+   RowBox[{"DMFit", "[", 
+    RowBox[{"dsmt", ",", "2"}], "]"}], "]"}], "]"}]], "Input",
+ CellLabel->"In[12]:=",ExpressionUUID->"bf563275-8595-4ce4-b9a4-6f42e44113dd"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Classical", " ", "multidimensional", " ", "scaling"}], " ", 
+  "*)"}]], "Input",
+ CellLabel->"In[13]:=",ExpressionUUID->"3c02c0d5-f798-4c77-8895-423176b957b1"],
+
+Cell[BoxData[
+ RowBox[{"graf2d", "[", 
+  RowBox[{"mknums", "[", 
+   RowBox[{"DMMDS", "[", 
+    RowBox[{"dsmt", ",", "2"}], "]"}], "]"}], "]"}]], "Input",
+ CellLabel->"In[14]:=",ExpressionUUID->"8aec4638-81a4-4b48-9c0e-3b34907d6ce3"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["K-Medoids", "Section",ExpressionUUID->"c609e4fa-05ef-43b5-8c6e-7d270bf873ae"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dsmt", " ", "=", " ", 
+   RowBox[{"DMExamples", "[", "\"\<WikiDM\>\"", "]"}]}], ";"}]], "Input",
+ CellLabel->"In[15]:=",ExpressionUUID->"3c844858-5bf9-4da6-a822-378e45d2f0d5"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{"What", " ", "centroids"}], ",", " ", "members", ",", " ", 
+   "assignments"}], " ", "*)"}]], "Input",
+ CellLabel->"In[16]:=",ExpressionUUID->"bf5d1f05-ad21-4aef-ab3c-49dea2c247ec"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DMKMedoidMultiRandom", "[", 
+   RowBox[{"dsmt", ",", "2", ",", "100", ",", "\"\<Phylogeny\>\""}], "]"}], 
+  " ", "//", " ", "tlsort"}]], "Input",
+ CellLabel->"In[18]:=",ExpressionUUID->"30e2edea-f220-4793-af74-ad6cd135ec20"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DMKMedoidAll", "[", 
+   RowBox[{"dsmt", ",", "2"}], "]"}], " ", "//", " ", "tlsort"}]], "Input",
+ CellLabel->"In[19]:=",ExpressionUUID->"8c75f621-1dff-479f-9bf6-bd1a0e6012f8"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Neighbor Joining", "Section",ExpressionUUID->"a11d2ab7-99f6-45c5-bc6b-18b4b2186bfd"],
+
+Cell[BoxData["NJAlgs"], "Input",ExpressionUUID->"b8926248-eeaa-44dc-b5a7-7cb52a6ec787"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"makeletseq", "[", 
+   RowBox[{"let_", ",", "n_"}], "]"}], " ", ":=", " ", 
+  RowBox[{"FromCharacterCode", " ", "/@", " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"First", "[", 
+      RowBox[{"ToCharacterCode", "[", "let", "]"}], "]"}], " ", "+", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Range", "[", "n", "]"}], "-", "1"}], ")"}]}], 
+    ")"}]}]}]], "Input",
+ CellLabel->"In[21]:=",ExpressionUUID->"8d1a6014-d915-432e-9ded-6cc63b99326a"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+  "Wikipedia", " ", "has", " ", "two", " ", "different", " ", "test", " ", 
+   "cases", " ", "for", " ", "its", " ", "NJ", " ", "algorithms"}], " ", 
+  "*)"}]], "Input",
+ CellLabel->"In[56]:=",ExpressionUUID->"15567f70-65d2-46a3-8be5-dfacb6b44550"],
+
+Cell[BoxData[
+ RowBox[{"njts", " ", "=", "  ", 
+  RowBox[{"Most", "[", "NJAlgs", "]"}]}]], "Input",ExpressionUUID->"e4775e28-\
+c8dd-49db-bf63-3ec1fc3bbf44"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dsmt", " ", "=", " ", 
+   RowBox[{"DMExamples", "[", "\"\<WikiUP\>\"", "]"}]}], ";", " ", 
+  RowBox[{"dmnames", " ", "=", " ", 
+   RowBox[{"makeletseq", "[", 
+    RowBox[{"\"\<a\>\"", ",", 
+     RowBox[{"Length", "[", "dsmt", "]"}]}], "]"}]}], ";", 
+  RowBox[{"dmnmxt", " ", "=", " ", 
+   RowBox[{"Join", "[", 
+    RowBox[{"dmnames", ",", 
+     RowBox[{"makeletseq", "[", 
+      RowBox[{"\"\<u\>\"", ",", 
+       RowBox[{
+        RowBox[{"Length", "[", "dsmt", "]"}], "-", "2"}]}], "]"}], ",", 
+     RowBox[{"{", "\"\<r\>\"", "}"}]}], "]"}]}], ";"}]], "Input",
+ CellLabel->
+  "In[135]:=",ExpressionUUID->"ca50d488-8fb3-458a-bbd7-600051a1305d"],
+
+Cell[BoxData[
+ RowBox[{"Table", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"treenj", " ", "=", " ", 
+     RowBox[{"NeighborJoin", "[", 
+      RowBox[{
+       RowBox[{"N", "[", "dsmt", "]"}], ",", "njt"}], "]"}]}], ";", " ", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"njt", " ", "<>", " ", "\"\<\\n\>\"", " ", "<>", " ", 
+       RowBox[{"NJDumpTree", "[", 
+        RowBox[{"treenj", ",", "dmnames"}], "]"}], " ", "<>", " ", 
+       "\"\<\\n\>\""}], ",", 
+      RowBox[{"NJMakeMmaGraph", "[", 
+       RowBox[{"treenj", ",", "dmnmxt"}], "]"}]}], "}"}]}], ",", 
+   RowBox[{"{", 
+    RowBox[{"njt", ",", "njts"}], "}"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[137]:=",ExpressionUUID->"d6b67042-80e4-44f6-83d1-6f8c80d435aa"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dsmt", " ", "=", " ", 
+   RowBox[{"DMExamples", "[", "\"\<WikiNJ\>\"", "]"}]}], ";", " ", 
+  RowBox[{"dmnames", " ", "=", " ", 
+   RowBox[{"makeletseq", "[", 
+    RowBox[{"\"\<a\>\"", ",", 
+     RowBox[{"Length", "[", "dsmt", "]"}]}], "]"}]}], ";", " ", 
+  RowBox[{"dmnmxt", " ", "=", " ", 
+   RowBox[{"Join", "[", 
+    RowBox[{"dmnames", ",", 
+     RowBox[{"makeletseq", "[", 
+      RowBox[{"\"\<u\>\"", ",", 
+       RowBox[{
+        RowBox[{"Length", "[", "dsmt", "]"}], "-", "2"}]}], "]"}], ",", 
+     RowBox[{"{", "\"\<r\>\"", "}"}]}], "]"}]}], ";"}]], "Input",
+ CellLabel->
+  "In[133]:=",ExpressionUUID->"b6e5ff1f-3a72-483f-b891-b42bad8ed97c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"treenj", " ", "=", " ", 
+   RowBox[{"NeighborJoin", "[", 
+    RowBox[{"dsmt", ",", 
+     RowBox[{"Last", "[", "NJAlgs", "]"}]}], "]"}]}], ";"}]], "Input",Expressi\
+onUUID->"5c7933dc-5332-4d99-a16d-136be6f06c19"],
+
+Cell[BoxData[
+ RowBox[{"NJDumpTree", "[", 
+  RowBox[{"treenj", ",", "dmnames"}], "]"}]], "Input",
+ CellLabel->
+  "In[115]:=",ExpressionUUID->"24ce4096-74c6-4eea-9ba1-45dae943c9cb"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"NJMakeMmaGraph", "[", 
+   RowBox[{"treenj", ",", "dmnmxt"}], "]"}], "}"}]], "Input",
+ CellLabel->
+  "In[134]:=",ExpressionUUID->"29c60ea1-d803-4d19-8d1d-d53a2a68772d"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Fitch-Margoliash trees", "Section",ExpressionUUID->"5dae6bb7-6c73-46ba-8c7c-09c9e394426e"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{"Improve", " ", "the", " ", "neighbor"}], "-", 
+   RowBox[{"joining", " ", "trees", " ", "with", " ", "Fitch"}], "-", 
+   RowBox[{"Margoliash", " ", "fitting"}]}], " ", "*)"}]], "Input",
+ CellLabel->"In[25]:=",ExpressionUUID->"b3900263-48a4-4ccd-aa6b-9d575ca92234"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"dsmt", " ", "=", " ", 
+   RowBox[{"DMExamples", "[", "\"\<WikiUP\>\"", "]"}]}], ";", " ", 
+  RowBox[{"treenjs", " ", "=", " ", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"NeighborJoin", "[", 
+      RowBox[{
+       RowBox[{"N", "[", "dsmt", "]"}], ",", "njt"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"njt", ",", "NJAlgs"}], "}"}]}], "]"}]}], ";"}]], "Input",Expres\
+sionUUID->"831bd19f-f3f7-4e6c-81f7-ca66d5a5f1f3"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"{", 
+   RowBox[{"fmnjtrees", ",", " ", "fmnjdists"}], "}"}], " ", "=", " ", 
+  RowBox[{"Transpose", "[", 
+   RowBox[{"NJtoFMTree", " ", "/@", " ", "treenjs"}], "]"}]}]], "Input",
+ CellLabel->
+  "In[234]:=",ExpressionUUID->"0cc5fab2-0221-464e-97e7-0d11e2a01502"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"{", 
+   RowBox[{"fmnjdstfits", ",", "fmnjerrs"}], "}"}], " ", "=", " ", 
+  RowBox[{"Transpose", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"FMDMFit", "[", 
+      RowBox[{"#", ",", 
+       RowBox[{"N", "[", "dsmt", "]"}]}], "]"}], "&"}], " ", "/@", " ", 
+    "fmnjtrees"}], "]"}]}]], "Input",
+ CellLabel->
+  "In[236]:=",ExpressionUUID->"3b2f8aae-798a-4d5d-b4df-9c03c974b666"],
+
+Cell[BoxData[
+ RowBox[{"Table", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"FMDMCheckRMS", "[", 
+      RowBox[{
+       RowBox[{"fmnjtrees", "[", 
+        RowBox[{"[", "k", "]"}], "]"}], ",", 
+       RowBox[{"fmnjdists", "[", 
+        RowBox[{"[", "k", "]"}], "]"}], ",", "dsmt"}], "]"}], ",", 
+     RowBox[{"fmnjerrs", "[", 
+      RowBox[{"[", "k", "]"}], "]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"k", ",", 
+     RowBox[{"Length", "[", "NJAlgs", "]"}]}], "}"}]}], "]"}]], "Input",Expres\
+sionUUID->"0fd99b36-b1a7-4286-8494-3d56985fa157"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Random", " ", "FM", " ", 
+   RowBox[{"trees", " ", "--"}], " ", "notice", " ", "that", " ", "their", 
+   " ", "errors", " ", "are", " ", "rather", " ", "similar"}], " ", 
+  "*)"}]], "Input",
+ CellLabel->
+  "In[238]:=",ExpressionUUID->"eff4736f-f995-400d-8bb5-8bf2260f7fa5"],
+
+Cell[BoxData[
+ RowBox[{"BlockRandom", "[", 
+  RowBox[{
+   RowBox[{"SeedRandom", "[", "\"\<Phylogeny\>\"", "]"}], ";", " ", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"FMDMFit", "[", 
+       RowBox[{
+        RowBox[{"FMRandomTree", "[", 
+         RowBox[{"Length", "[", "dsmt", "]"}], "]"}], ",", 
+        RowBox[{"N", "[", "dsmt", "]"}]}], "]"}], "[", 
+      RowBox[{"[", "2", "]"}], "]"}], ",", 
+     RowBox[{"{", "10", "}"}]}], "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[240]:=",ExpressionUUID->"1a8b0021-76be-4383-9c5d-585c7afcdbb8"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Incremental", " ", "improvement"}], " ", "*)"}]], "Input",
+ CellLabel->"In[31]:=",ExpressionUUID->"ac2e83d7-70da-4fe5-bfd1-c78c077a7c86"],
+
+Cell[BoxData[
+ RowBox[{"treefminc", " ", "=", " ", 
+  RowBox[{"FMIncremental", "[", 
+   RowBox[{"N", "[", "dsmt", "]"}], "]"}]}]], "Input",
+ CellLabel->
+  "In[270]:=",ExpressionUUID->"28210971-1cbb-481c-a866-8d12e28b47e4"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Link", "-", 
+   RowBox[{
+   "flipping", " ", "improvement", " ", "of", " ", "random", " ", "trees"}]}],
+   " ", "*)"}]], "Input",
+ CellLabel->"In[33]:=",ExpressionUUID->"a26d2fb3-2856-483c-86df-7d197180f2f3"],
+
+Cell[BoxData[
+ RowBox[{"treefmrfs", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"BlockRandom", "[", 
+    RowBox[{
+     RowBox[{"SeedRandom", "[", "\"\<Phylogeny\>\"", "]"}], ";", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"FMImproveByFlipping", "[", 
+        RowBox[{
+         RowBox[{"FMRandomTree", "[", 
+          RowBox[{
+           RowBox[{"Length", "[", "dsmt", "]"}], ",", "True"}], "]"}], ",", 
+         RowBox[{"N", "[", "dsmt", "]"}]}], "]"}], ",", 
+       RowBox[{"{", "10", "}"}]}], "]"}]}], "]"}], " ", "//", " ", 
+   "tlsort"}]}]], "Input",
+ CellLabel->
+  "In[313]:=",ExpressionUUID->"0e900631-51dd-47f3-b105-a10b42d07d00"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{"Mma", " ", "graph", " ", 
+    RowBox[{"objects", " ", "--"}], " ", "NJ"}], ",", " ", 
+   RowBox[{"FM", " ", "trees"}]}], " ", "*)"}]], "Input",
+ CellLabel->"In[35]:=",ExpressionUUID->"57f4604e-119b-4e5c-a418-69bc3db32fdb"],
+
+Cell[BoxData[
+ RowBox[{"NJMakeMmaGraph", "[", 
+  RowBox[{"treenjs", "[", 
+   RowBox[{"[", "1", "]"}], "]"}], "]"}]], "Input",
+ CellLabel->
+  "In[314]:=",ExpressionUUID->"e7327203-beb6-481b-8e81-4e8e5c4d03bf"],
+
+Cell[BoxData[
+ RowBox[{"FMMakeMmaGraph", "[", 
+  RowBox[{
+   RowBox[{"fmnjtrees", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"fmnjdists", "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[315]:=",ExpressionUUID->"49905bbc-0634-466b-9dd9-b4fc46b6d169"],
+
+Cell[BoxData[
+ RowBox[{"FMMakeMmaGraph", "[", 
+  RowBox[{
+   RowBox[{"treefminc", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"treefminc", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ",", "1"}], "]"}], "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[316]:=",ExpressionUUID->"c07fba92-6413-4bd9-a029-85bc5e23db1a"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{"Small", " ", "trees"}], " ", "*)"}]], "Input",
+ CellLabel->"In[39]:=",ExpressionUUID->"9db219d6-9782-48cf-97f2-4259dbaf328a"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"dsmt", " ", "=", " ", 
+    RowBox[{"DMExamples", "[", "\"\<WikiNJ\>\"", "]"}]}], ";"}], 
+  " "}]], "Input",
+ CellLabel->
+  "In[334]:=",ExpressionUUID->"b1216936-6fa6-48e4-8239-9604be0b7935"],
+
+Cell[BoxData[
+ RowBox[{"NeighborJoin", "[", 
+  RowBox[{
+   RowBox[{"N", "[", "dsmt", "]"}], ",", "\"\<NeiSaitou\>\""}], 
+  "]"}]], "Input",
+ CellLabel->
+  "In[335]:=",ExpressionUUID->"956d940c-a882-4f47-8a6d-e0e30b050443"],
+
+Cell[BoxData[
+ RowBox[{"NJtoFMTree", "[", "%", "]"}]], "Input",
+ CellLabel->
+  "In[336]:=",ExpressionUUID->"3252d310-643b-4e1b-91e7-0e7bfd6cb439"],
+
+Cell[BoxData[
+ RowBox[{"FMDMFit", "[", 
+  RowBox[{
+   RowBox[{"%", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"N", "[", "dsmt", "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[337]:=",ExpressionUUID->"da6eca02-82a4-4157-a8c2-7a17b9737f98"],
+
+Cell[BoxData[
+ RowBox[{"FMIncremental", "[", 
+  RowBox[{"N", "[", "dsmt", "]"}], "]"}]], "Input",
+ CellLabel->
+  "In[338]:=",ExpressionUUID->"d04ec9d2-ae62-4174-88dd-998a837489a8"],
+
+Cell[BoxData[
+ RowBox[{"FMImproveByFlipping", "[", 
+  RowBox[{
+   RowBox[{"%", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"N", "[", "dsmt", "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[339]:=",ExpressionUUID->"b74fafea-283d-40fa-8c66-664834318d8c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"dsmt", " ", "=", " ", 
+    RowBox[{"DMExamples", "[", "\"\<WikiDM\>\"", "]"}]}], ";"}], 
+  " "}]], "Input",
+ CellLabel->
+  "In[340]:=",ExpressionUUID->"08fe1bfb-ebc6-42cf-adf1-254d364cf9c2"],
+
+Cell[BoxData[
+ RowBox[{"NeighborJoin", "[", 
+  RowBox[{
+   RowBox[{"N", "[", "dsmt", "]"}], ",", "\"\<NeiSaitou\>\""}], 
+  "]"}]], "Input",
+ CellLabel->
+  "In[341]:=",ExpressionUUID->"c318836d-6ad3-4ca3-be57-148f2d211057"],
+
+Cell[BoxData[
+ RowBox[{"NJtoFMTree", "[", "%", "]"}]], "Input",
+ CellLabel->
+  "In[342]:=",ExpressionUUID->"9e6403fb-4994-4007-90c0-1c0aa5c1b3d7"],
+
+Cell[BoxData[
+ RowBox[{"FMDMFit", "[", 
+  RowBox[{
+   RowBox[{"%", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"N", "[", "dsmt", "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[343]:=",ExpressionUUID->"44740c09-4fe9-48b4-a25c-37384629a899"],
+
+Cell[BoxData[
+ RowBox[{"FMIncremental", "[", 
+  RowBox[{"N", "[", "dsmt", "]"}], "]"}]], "Input",
+ CellLabel->
+  "In[344]:=",ExpressionUUID->"0c617fe4-a7ce-4ea3-a73c-575bfeef2851"],
+
+Cell[BoxData[
+ RowBox[{"FMImproveByFlipping", "[", 
+  RowBox[{
+   RowBox[{"%", "[", 
+    RowBox[{"[", "1", "]"}], "]"}], ",", 
+   RowBox[{"N", "[", "dsmt", "]"}]}], "]"}]], "Input",
+ CellLabel->
+  "In[345]:=",ExpressionUUID->"f87bae83-9d83-4496-b90f-e6e170e9a5e9"],
+
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{
+   "FMCycles", " ", "counts", " ", "how", " ", "many", " ", "cycles", " ", 
+    "there", " ", "are", " ", "in", " ", "a", " ", 
+    RowBox[{"graph", " ", "--"}], " ", "supposed", " ", "to", " ", "be", " ", 
+    "none", " ", "for", " ", "the", " ", "phylogeny", " ", "trees"}], ",", 
+   " ", 
+   RowBox[{"one", " ", "for", " ", "benzene", " ", "molecules"}], ",", " ", 
+   RowBox[{
+   "and", " ", "four", " ", "for", " ", "the", " ", "famous", " ", "bridges", 
+    " ", "of", " ", 
+    RowBox[{"Koenigsberg", "."}]}]}], " ", "*)"}]], "Input",
+ CellLabel->
+  "In[346]:=",ExpressionUUID->"25c6ede8-f6c2-41e8-91b2-953fc8a1f156"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"benzene", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "7"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "8"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "9"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"4", ",", "10"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"5", ",", "11"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"6", ",", "12"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"7", ",", "8"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"8", ",", "9"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"9", ",", "10"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"10", ",", "11"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"11", ",", "12"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"12", ",", "7"}], "}"}]}], "}"}]}], ";"}]], "Input",
+ CellLabel->
+  "In[347]:=",ExpressionUUID->"e1e3c625-3cdc-406c-acc1-2f0080be1e57"],
+
+Cell[BoxData[
+ RowBox[{"FMCycles", "[", "benzene", "]"}]], "Input",
+ CellLabel->
+  "In[348]:=",ExpressionUUID->"2ebec75d-6a04-41b4-9191-b0c7537c47f2"],
+
+Cell[BoxData[
+ RowBox[{"Graph", "[", 
+  RowBox[{"UndirectedEdge", " ", "@@@", " ", "benzene"}], "]"}]], "Input",
+ CellLabel->
+  "In[350]:=",ExpressionUUID->"48e95aa3-e28d-41fa-b5d5-d8836b15623d"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"koenigsberg", " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "3"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "3"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "4"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "3"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"2", ",", "4"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "4"}], "}"}]}], "}"}]}], ";"}]], "Input",
+ CellLabel->
+  "In[330]:=",ExpressionUUID->"7b5ce76f-a696-4158-a2a5-a53454218bd9"],
+
+Cell[BoxData[
+ RowBox[{"FMCycles", "[", "koenigsberg", "]"}]], "Input",
+ CellLabel->
+  "In[331]:=",ExpressionUUID->"29d60c4e-0437-49af-81d7-25cb4815447c"],
+
+Cell[BoxData[
+ RowBox[{"Graph", "[", 
+  RowBox[{"UndirectedEdge", " ", "@@@", " ", "koenigsberg"}], "]"}]], "Input",\
+
+ CellLabel->
+  "In[351]:=",ExpressionUUID->"d379ea61-d623-40c1-8f11-d02b155348c4"],
+
+Cell[BoxData[
+ RowBox[{"FMCycles", " ", "/@", " ", "fmnjtrees"}]], "Input",
+ CellLabel->
+  "In[332]:=",ExpressionUUID->"a0fe1657-e26e-4c4c-b9ce-3dffd328db2b"]
+}, Closed]]
+},
+WindowSize->{808, 695},
+WindowMargins->{{Automatic, 2}, {93, Automatic}},
+FrontEndVersion->"14.1 for Mac OS X x86 (64-bit) (July 16, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"7da8edad-78f4-442a-8b5d-957bc72117bf"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 165, 4, 77, "Text",ExpressionUUID->"807f508c-13fc-499c-9554-04f21c2c214f"],
+Cell[726, 26, 257, 5, 29, "Input",ExpressionUUID->"e8ab3e2a-066e-421d-8fe2-3dfd20232acc"],
+Cell[CellGroupData[{
+Cell[1008, 35, 82, 0, 53, "Subsection",ExpressionUUID->"3b08746c-5da1-4884-8431-292ca98731ef"],
+Cell[1093, 37, 368, 8, 30, "Input",ExpressionUUID->"8bbda1ef-2b83-43c2-88d6-3e0b224b0aff"],
+Cell[1464, 47, 424, 12, 30, "Input",ExpressionUUID->"5eab6b92-c2bb-4ab4-8859-fb7c5aed71ff"],
+Cell[1891, 61, 292, 6, 30, "Input",ExpressionUUID->"728ca50e-e6c7-4de8-87da-52703b71a473"],
+Cell[2186, 69, 724, 21, 30, "Input",ExpressionUUID->"3a5fe163-0ac8-41b0-a8d0-62057ee52bd4"],
+Cell[2913, 92, 810, 23, 52, "Input",ExpressionUUID->"10d2d748-f15d-4d90-a247-690c8f6f3b31"],
+Cell[3726, 117, 215, 4, 30, "Input",ExpressionUUID->"d9947208-6251-42cc-a825-6ac2afcaf1dc"],
+Cell[3944, 123, 342, 9, 30, "Input",ExpressionUUID->"b3aa3e6c-7808-44dc-bf08-a50c23a070d5"],
+Cell[4289, 134, 233, 6, 30, "Input",ExpressionUUID->"e5804e01-60eb-4a24-8b88-f14d70a52c6e"],
+Cell[4525, 142, 346, 9, 30, "Input",ExpressionUUID->"4eb3b164-9565-4fbe-90fe-2fd96874ebfa"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[4908, 156, 97, 0, 52, "Section",ExpressionUUID->"f1f95fc9-cf63-46c1-a2d8-07a4d35cb2d9"],
+Cell[5008, 158, 210, 4, 30, "Input",ExpressionUUID->"0ffbee5f-962f-4527-9d52-b3836cf1548c"],
+Cell[5221, 164, 205, 4, 30, "Input",ExpressionUUID->"b6452a21-e92a-4797-9466-5a395d01c570"],
+Cell[5429, 170, 232, 5, 30, "Input",ExpressionUUID->"bf563275-8595-4ce4-b9a4-6f42e44113dd"],
+Cell[5664, 177, 205, 4, 30, "Input",ExpressionUUID->"3c02c0d5-f798-4c77-8895-423176b957b1"],
+Cell[5872, 183, 232, 5, 30, "Input",ExpressionUUID->"8aec4638-81a4-4b48-9c0e-3b34907d6ce3"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[6141, 193, 83, 0, 52, "Section",ExpressionUUID->"c609e4fa-05ef-43b5-8c6e-7d270bf873ae"],
+Cell[6227, 195, 210, 4, 29, "Input",ExpressionUUID->"3c844858-5bf9-4da6-a822-378e45d2f0d5"],
+Cell[6440, 201, 238, 5, 29, "Input",ExpressionUUID->"bf5d1f05-ad21-4aef-ab3c-49dea2c247ec"],
+Cell[6681, 208, 259, 5, 29, "Input",ExpressionUUID->"30e2edea-f220-4793-af74-ad6cd135ec20"],
+Cell[6943, 215, 210, 4, 29, "Input",ExpressionUUID->"8c75f621-1dff-479f-9bf6-bd1a0e6012f8"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[7190, 224, 90, 0, 52, "Section",ExpressionUUID->"a11d2ab7-99f6-45c5-bc6b-18b4b2186bfd"],
+Cell[7283, 226, 87, 0, 30, "Input",ExpressionUUID->"b8926248-eeaa-44dc-b5a7-7cb52a6ec787"],
+Cell[7373, 228, 491, 13, 52, "Input",ExpressionUUID->"8d1a6014-d915-432e-9ded-6cc63b99326a"],
+Cell[7867, 243, 294, 6, 30, "Input",ExpressionUUID->"15567f70-65d2-46a3-8be5-dfacb6b44550"],
+Cell[8164, 251, 156, 3, 30, "Input",ExpressionUUID->"e4775e28-c8dd-49db-bf63-3ec1fc3bbf44"],
+Cell[8323, 256, 678, 17, 52, "Input",ExpressionUUID->"ca50d488-8fb3-458a-bbd7-600051a1305d"],
+Cell[9004, 275, 720, 19, 73, "Input",ExpressionUUID->"d6b67042-80e4-44f6-83d1-6f8c80d435aa"],
+Cell[9727, 296, 683, 17, 52, "Input",ExpressionUUID->"b6e5ff1f-3a72-483f-b891-b42bad8ed97c"],
+Cell[10413, 315, 246, 6, 30, "Input",ExpressionUUID->"5c7933dc-5332-4d99-a16d-136be6f06c19"],
+Cell[10662, 323, 180, 4, 30, "Input",ExpressionUUID->"24ce4096-74c6-4eea-9ba1-45dae943c9cb"],
+Cell[10845, 329, 207, 5, 30, "Input",ExpressionUUID->"29c60ea1-d803-4d19-8d1d-d53a2a68772d"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[11089, 339, 96, 0, 52, "Section",ExpressionUUID->"5dae6bb7-6c73-46ba-8c7c-09c9e394426e"],
+Cell[11188, 341, 322, 6, 30, "Input",ExpressionUUID->"b3900263-48a4-4ccd-aa6b-9d575ca92234"],
+Cell[11513, 349, 467, 12, 30, "Input",ExpressionUUID->"831bd19f-f3f7-4e6c-81f7-ca66d5a5f1f3"],
+Cell[11983, 363, 296, 7, 30, "Input",ExpressionUUID->"0cc5fab2-0221-464e-97e7-0d11e2a01502"],
+Cell[12282, 372, 410, 12, 30, "Input",ExpressionUUID->"3b2f8aae-798a-4d5d-b4df-9c03c974b666"],
+Cell[12695, 386, 564, 16, 30, "Input",ExpressionUUID->"0fd99b36-b1a7-4286-8494-3d56985fa157"],
+Cell[13262, 404, 319, 7, 30, "Input",ExpressionUUID->"eff4736f-f995-400d-8bb5-8bf2260f7fa5"],
+Cell[13584, 413, 563, 15, 52, "Input",ExpressionUUID->"1a8b0021-76be-4383-9c5d-585c7afcdbb8"],
+Cell[14150, 430, 183, 3, 30, "Input",ExpressionUUID->"ac2e83d7-70da-4fe5-bfd1-c78c077a7c86"],
+Cell[14336, 435, 222, 5, 30, "Input",ExpressionUUID->"28210971-1cbb-481c-a866-8d12e28b47e4"],
+Cell[14561, 442, 254, 6, 30, "Input",ExpressionUUID->"a26d2fb3-2856-483c-86df-7d197180f2f3"],
+Cell[14818, 450, 647, 17, 73, "Input",ExpressionUUID->"0e900631-51dd-47f3-b105-a10b42d07d00"],
+Cell[15468, 469, 280, 6, 30, "Input",ExpressionUUID->"57f4604e-119b-4e5c-a418-69bc3db32fdb"],
+Cell[15751, 477, 208, 5, 30, "Input",ExpressionUUID->"e7327203-beb6-481b-8e81-4e8e5c4d03bf"],
+Cell[15962, 484, 297, 8, 30, "Input",ExpressionUUID->"49905bbc-0634-466b-9dd9-b4fc46b6d169"],
+Cell[16262, 494, 323, 9, 30, "Input",ExpressionUUID->"c07fba92-6413-4bd9-a029-85bc5e23db1a"],
+Cell[16588, 505, 171, 3, 30, "Input",ExpressionUUID->"9db219d6-9782-48cf-97f2-4259dbaf328a"],
+Cell[16762, 510, 237, 7, 30, "Input",ExpressionUUID->"b1216936-6fa6-48e4-8239-9604be0b7935"],
+Cell[17002, 519, 222, 6, 30, "Input",ExpressionUUID->"956d940c-a882-4f47-8a6d-e0e30b050443"],
+Cell[17227, 527, 146, 3, 30, "Input",ExpressionUUID->"3252d310-643b-4e1b-91e7-0e7bfd6cb439"],
+Cell[17376, 532, 252, 7, 30, "Input",ExpressionUUID->"da6eca02-82a4-4157-a8c2-7a17b9737f98"],
+Cell[17631, 541, 180, 4, 30, "Input",ExpressionUUID->"d04ec9d2-ae62-4174-88dd-998a837489a8"],
+Cell[17814, 547, 264, 7, 30, "Input",ExpressionUUID->"b74fafea-283d-40fa-8c66-664834318d8c"],
+Cell[18081, 556, 237, 7, 30, "Input",ExpressionUUID->"08fe1bfb-ebc6-42cf-adf1-254d364cf9c2"],
+Cell[18321, 565, 222, 6, 30, "Input",ExpressionUUID->"c318836d-6ad3-4ca3-be57-148f2d211057"],
+Cell[18546, 573, 146, 3, 30, "Input",ExpressionUUID->"9e6403fb-4994-4007-90c0-1c0aa5c1b3d7"],
+Cell[18695, 578, 252, 7, 30, "Input",ExpressionUUID->"44740c09-4fe9-48b4-a25c-37384629a899"],
+Cell[18950, 587, 180, 4, 30, "Input",ExpressionUUID->"0c617fe4-a7ce-4ea3-a73c-575bfeef2851"],
+Cell[19133, 593, 264, 7, 30, "Input",ExpressionUUID->"f87bae83-9d83-4496-b90f-e6e170e9a5e9"],
+Cell[19400, 602, 682, 15, 73, "Input",ExpressionUUID->"25c6ede8-f6c2-41e8-91b2-953fc8a1f156"],
+Cell[20085, 619, 960, 30, 52, "Input",ExpressionUUID->"e1e3c625-3cdc-406c-acc1-2f0080be1e57"],
+Cell[21048, 651, 150, 3, 30, "Input",ExpressionUUID->"2ebec75d-6a04-41b4-9191-b0c7537c47f2"],
+Cell[21201, 656, 195, 4, 30, "Input",ExpressionUUID->"48e95aa3-e28d-41fa-b5d5-d8836b15623d"],
+Cell[21399, 662, 640, 20, 30, "Input",ExpressionUUID->"7b5ce76f-a696-4158-a2a5-a53454218bd9"],
+Cell[22042, 684, 154, 3, 30, "Input",ExpressionUUID->"29d60c4e-0437-49af-81d7-25cb4815447c"],
+Cell[22199, 689, 201, 5, 30, "Input",ExpressionUUID->"d379ea61-d623-40c1-8f11-d02b155348c4"],
+Cell[22403, 696, 158, 3, 30, "Input",ExpressionUUID->"a0fe1657-e26e-4c4c-b9ce-3dffd328db2b"]
+}, Closed]]
+}
+]
+*)
+
